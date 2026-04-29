@@ -18,8 +18,8 @@
   --text-dark:    #1C1C1A;     /* Headings, body */
   --text-mid:     #5C5A57;     /* Secondary text */
   --text-light:   #9C9A96;     /* Hints, metadata */
-  --accent:       #C4622D;     /* Links, hover, active — change this to rebrand */
-  --accent-hover: #A3501F;
+  --accent:       #0d6931;     /* Links, hover, active — change this to rebrand */
+  --accent-hover: #25db80;
   --accent-bg:    #FDF0E8;     /* Very light accent tint */
 
   /* ---- Shape ---- */

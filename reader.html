@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reader — Mentor Magic</title>
+  <title>Reader — Sharpur Edge</title>
 
   <!-- StPageFlip library (hosted on CDN, no install needed) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/page-flip/dist/css/page-flip.min.css">
@@ -281,7 +281,7 @@
 
     <!-- Left: Back + title -->
     <div class="bar-seg">
-      <a href="index.html" class="btn" aria-label="Back to archive">← Archive</a>
+      <a href="index.html" class="btn" aria-label="Back to archive">Main Screen</a>
       <div class="divider"></div>
       <span id="magTitle">Loading…</span>
     </div>
@@ -368,7 +368,7 @@
 
     <!-- Text-to-speech controls -->
     <div class="tts-section">
-      <button class="btn" id="readBtn" aria-label="Read this page aloud">🔊 Read this page</button>
+      <button class="btn" id="readBtn" aria-label="Read this page aloud">Read this page</button>
       <small id="audioStatus" aria-live="polite"></small>
 
       <div class="speed-row" role="group" aria-label="Speech speed">
@@ -744,7 +744,7 @@
     }
 
     // 4. Update page title and PDF links
-    document.title        = `${magazine.title} — Mentor Magic`;
+    document.title        = `${magazine.title} — Sharpur Edge`;
     magTitleEl.textContent = magazine.title;
     downloadBtn.href       = magazine.pdf || '#';
     downloadBtn.download   = `${magazine.id}.pdf`;
