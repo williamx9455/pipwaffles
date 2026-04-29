@@ -31,6 +31,10 @@ IMAGE SETTINGS
 - DPI 200 → ~400–700 KB per page (higher quality, slower to load)
   Change DPI below if needed.
 - JPEG quality 85 is a good balance. Increase to 92 for sharper images.
+
+-------------
+Note: PLEASE ONLY UPLOAD PDFS WITH SEPARATED PAGES, NOT SPREADS.
+-------------
 """
 
 import sys
@@ -45,7 +49,7 @@ from pathlib import Path
 # ==============================================================
 PAGE_DPI      = 150    # Resolution for page images (150 = good, 200 = high quality)
 COVER_DPI     = 200    # Resolution for the cover thumbnail (slightly sharper)
-JPEG_QUALITY  = 85     # JPEG compression (1–95). 85 = excellent balance.
+JPEG_QUALITY  = 95     # JPEG compression (1–95). 85 = excellent balance.
 COVER_QUALITY = 90     # Cover can be slightly higher quality.
 # ==============================================================
 
