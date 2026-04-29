@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reader — Sharpur Edge</title>
+  <title>Sharpur Edge Reader</title>
 
   <!-- StPageFlip library (hosted on CDN, no install needed) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/page-flip/dist/css/page-flip.min.css">
@@ -320,7 +320,6 @@
      FULL-PAGE ERROR (shown if magazine not found)
      ============================================================ -->
 <div id="fullError" role="alert">
-  <span class="icon">📭</span>
   <h2 id="errorHeading">Magazine not found</h2>
   <p id="errorDetail"></p>
   <a href="index.html" class="btn btn-accent" style="margin-top:12px; display:inline-flex;">← Back to Archive</a>
@@ -339,7 +338,6 @@
 
     <!-- Error state inside stage -->
     <div id="stageError" role="alert">
-      <span class="err-icon">🖼️</span>
       <strong>Could not load page images.</strong>
       <p style="font-size:0.85rem; color:var(--text-light)">
         Check that images exist in <code>pages/{id}/</code>.
@@ -405,7 +403,7 @@
   /* ================================================================
      READER PAGE — JAVASCRIPT
      ----------------------------------------------------------------
-     ✋ FUTURE EMPLOYEES: Do NOT edit this script.
+     FUTURE EMPLOYEES: Do NOT edit this script.
         To update magazine text/captions, edit the file:
           data/pages/{magazine-id}.json
         To add a new magazine, edit:
@@ -547,7 +545,7 @@
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     isSpeaking        = false;
     currentUtterance  = null;
-    readBtn.textContent = '🔊 Read this page';
+    readBtn.textContent = 'Read this page';
     readBtn.setAttribute('aria-label', 'Read this page aloud');
     audioStatus.textContent = '';
   }
@@ -580,7 +578,7 @@
     utter.onend = () => {
       isSpeaking = false;
       currentUtterance = null;
-      readBtn.textContent = '🔊 Read this page';
+      readBtn.textContent = 'Read this page';
       readBtn.setAttribute('aria-label', 'Read this page aloud');
       audioStatus.textContent = 'Finished.';
       setTimeout(() => { audioStatus.textContent = ''; }, 2000);
