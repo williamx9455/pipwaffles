@@ -18,9 +18,9 @@
   --text-dark:    #1C1C1A;     /* Headings, body */
   --text-mid:     #5C5A57;     /* Secondary text */
   --text-light:   #9C9A96;     /* Hints, metadata */
-  --accent:       #0d6931;     /* Links, hover, active — change this to rebrand */
-  --accent-hover: #25db80;
-  --accent-bg:    #FDF0E8;     /* Very light accent tint */
+  --accent:       #005a43;     /* Links, hover, active — change this to rebrand */
+  --accent-hover: #cedc00;
+  --accent-bg:    #6cc24a;     /* Very light accent tint */
 
   /* ---- Shape ---- */
   --radius:       6px;         /* Corner radius for cards / buttons */
