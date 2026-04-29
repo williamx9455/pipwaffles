@@ -2,7 +2,7 @@
    MENTOR MAGIC — SHARED STYLES
    style.css
    -----------------------------------------------------------------
-   ✏️  FUTURE EDITORS: This is the ONE file to edit if you want to
+   FUTURE EDITORS: This is the ONE file to edit if you want to
    change the look of the entire site (colors, fonts, spacing).
 
    Change values inside :root { } only.
@@ -104,7 +104,7 @@ img {
 .btn-accent:hover {
   background: var(--accent-hover);
   border-color: var(--accent-hover);
-  color: #fff;
+  color: #6cc24a;
 }
 .btn-icon {
   padding: 7px 10px;
