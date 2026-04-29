@@ -1,6 +1,11 @@
 [
   {
     "title": "Page 1",
+    "text": "Cover",
+    "captions": ""
+  },
+  {
+    "title": "Page 2",
     "text": "CONTENTS
 
             Layout Editors
@@ -37,11 +42,6 @@
             University partners! Happy reading!
             All the best, 
             Grace and Rayaan",
-    "captions": ""
-  },
-  {
-    "title": "Page 2",
-    "text": "",
     "captions": ""
   },
   {
