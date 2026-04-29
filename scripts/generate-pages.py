@@ -47,8 +47,8 @@ from pathlib import Path
 # ==============================================================
 # ✏️  CONFIGURABLE SETTINGS — adjust these if needed
 # ==============================================================
-PAGE_DPI      = 150    # Resolution for page images (150 = good, 200 = high quality)
-COVER_DPI     = 200    # Resolution for the cover thumbnail (slightly sharper)
+PAGE_DPI      = 250    # Resolution for page images (150 = good, 200 = high quality)
+COVER_DPI     = 250    # Resolution for the cover thumbnail (slightly sharper)
 JPEG_QUALITY  = 95     # JPEG compression (1–95). 85 = excellent balance.
 COVER_QUALITY = 90     # Cover can be slightly higher quality.
 # ==============================================================
