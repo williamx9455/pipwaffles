@@ -114,6 +114,21 @@
       background: var(--accent-bg);
     }
 
+    /* Sort dropdown */
+    #sortSelect {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      color: var(--text-mid);
+      cursor: pointer;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    #sortSelect:focus { border-color: var(--accent); }
+
     /* ---- Result count line ---- */
     .result-info {
       max-width: 1280px;
@@ -304,6 +319,11 @@
 
   <!-- Filter buttons are generated dynamically from magazines.json -->
   <div class="filter-group" id="filterGroup" role="group" aria-label="Filter by year or category"></div>
+  <select id="sortSelect" aria-label="Sort magazines">
+  <option value="newest">Newest first</option>
+  <option value="oldest">Oldest first</option>
+  <option value="title">Title A–Z</option>
+</select>
 </div>
 
 <!-- Result count (updated dynamically) -->
@@ -455,25 +475,30 @@
   // STEP 3: Filter and render the grid
   // ----------------------------------------------------------------
   function getFilteredMagazines() {
-    return allMagazines.filter(mag => {
-
-      // Tag filter: must match at least one active filter
+    let results = allMagazines.filter(mag => {
       if (activeFilters.size > 0) {
         const matchesYear     = mag.year     && activeFilters.has(mag.year);
         const matchesCategory = mag.category && activeFilters.has(mag.category);
         if (!matchesYear && !matchesCategory) return false;
       }
-
-      // Search filter: must contain query string somewhere
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
         const haystack = [mag.title, mag.year, mag.category, mag.description]
           .filter(Boolean).join(' ').toLowerCase();
         if (!haystack.includes(q)) return false;
       }
-
       return true;
     });
+
+    const sort = document.getElementById('sortSelect').value;
+    results.sort((a, b) => {
+      if (sort === 'newest') return (b.year || '').localeCompare(a.year || '');
+      if (sort === 'oldest') return (a.year || '').localeCompare(b.year || '');
+      if (sort === 'title')  return (a.title || '').localeCompare(b.title || '');
+      return 0;
+    });
+
+    return results;
   }
 
   function renderGrid() {
@@ -571,6 +596,8 @@
     renderGrid();
   });
 
+  document.getElementById('sortSelect').addEventListener('change', renderGrid);
+  
   // ----------------------------------------------------------------
   // Initialize on page load
   // ----------------------------------------------------------------
