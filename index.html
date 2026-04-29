@@ -290,7 +290,9 @@
      ============================================================ -->
 <header class="site-header" role="banner">
   <div class="header-inner">
-    <a class="wordmark" href="index.html">Sharpur <em>Edge</em></a>
+    <a href="index.html" aria-label="Sharpur Edge — home">
+      <img src="assets/sharpur-edge-logo.svg" alt="Sharpur Edge" height="32">
+    </a>
   </div>
 </header>
 
@@ -597,7 +599,7 @@
   });
 
   document.getElementById('sortSelect').addEventListener('change', renderGrid);
-  
+
   // ----------------------------------------------------------------
   // Initialize on page load
   // ----------------------------------------------------------------
