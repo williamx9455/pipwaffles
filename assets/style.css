@@ -13,7 +13,7 @@
 :root {
   /* ---- Brand Colors ---- */
   --bg:           #FAF9F7;     /* Page background */
-  --surface:      #FFFFFF;     /* Cards, header */
+  --surface:      #6cc24a;     /* Cards, header */
   --border:       #E8E4DF;     /* Subtle dividers */
   --text-dark:    #1C1C1A;     /* Headings, body */
   --text-mid:     #5C5A57;     /* Secondary text */
