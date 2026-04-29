@@ -1,0 +1,32 @@
+[
+  {
+    "id":          "mentor-magic-spring-2026",
+    "title":       "Mentor Magic — Spring 2026",
+    "year":        "2026",
+    "category":    "Spring Issue",
+    "pageCount":   16,
+    "pdf":         "magazines/mentor-magic-spring-2026.pdf",
+    "cover":       "covers/mentor-magic-spring-2026.jpg",
+    "description": "Spring issue featuring mentorship stories and program highlights."
+  },
+  {
+    "id":          "mentor-magic-fall-2025",
+    "title":       "Mentor Magic — Fall 2025",
+    "year":        "2025",
+    "category":    "Fall Issue",
+    "pageCount":   20,
+    "pdf":         "magazines/mentor-magic-fall-2025.pdf",
+    "cover":       "covers/mentor-magic-fall-2025.jpg",
+    "description": "Fall 2025 issue with stories from the new cohort."
+  },
+  {
+    "id":          "mentor-magic-spring-2025",
+    "title":       "Mentor Magic — Spring 2025",
+    "year":        "2025",
+    "category":    "Spring Issue",
+    "pageCount":   18,
+    "pdf":         "magazines/mentor-magic-spring-2025.pdf",
+    "cover":       "covers/mentor-magic-spring-2025.jpg",
+    "description": "Our inaugural issue celebrating the program's launch."
+  }
+]

@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reader — Mentor Magic</title>
+
+  <!-- StPageFlip library (hosted on CDN, no install needed) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/page-flip/dist/css/page-flip.min.css">
+
+  <!-- Shared design tokens -->
+  <link rel="stylesheet" href="assets/style.css">
+
+  <style>
+    /* =============================================================
+       READER PAGE STYLES
+       ============================================================= */
+
+    /* ---- Header bar ---- */
+    .reader-header {
+      height: auto;
+      min-height: 56px;
+      padding: 8px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* Each segment of the header toolbar */
+    .bar-seg {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+    .bar-seg-grow { flex: 1 1 auto; }
+
+    /* Magazine title in header */
+    #magTitle {
+      font-family: var(--font-serif);
+      font-size: 0.9rem;
+      font-weight: normal;
+      color: var(--text-mid);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 220px;
+    }
+
+    /* Page number input */
+    .page-nav {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.85rem;
+      color: var(--text-mid);
+    }
+    #pageInput {
+      width: 52px;
+      padding: 5px 6px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-family: var(--font-sans);
+      text-align: center;
+      color: var(--text-dark);
+      outline: none;
+    }
+    #pageInput:focus { border-color: var(--accent); }
+
+    /* Zoom label */
+    #zoomLabel {
+      font-size: 0.8rem;
+      color: var(--text-mid);
+      min-width: 38px;
+      text-align: center;
+    }
+
+    /* Status / loading message */
+    #statusMsg {
+      font-size: 0.78rem;
+      color: var(--text-light);
+    }
+
+    /* ---- MAIN LAYOUT: flipbook + side panel ---- */
+    #layout {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      max-width: 1400px;
+      margin: 16px auto 48px;
+      padding: 0 16px;
+    }
+
+    /* ---- Flipbook stage ---- */
+    #stageWrap {
+      flex: 1 1 auto;
+      min-width: 0;
+      background: #DDDAD5;
+      border-radius: 8px;
+      padding: 12px;
+      overflow: auto;
+    }
+    #stage {
+      margin: 0 auto;
+      /* Width and height are set dynamically by JS */
+      width: 900px;
+      height: 600px;
+      transition: transform 0.1s;
+    }
+    #book {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Error overlay inside stage */
+    #stageError {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 400px;
+      gap: 12px;
+      text-align: center;
+      color: var(--text-mid);
+    }
+    #stageError .err-icon { font-size: 2.5rem; }
+    #stageError.visible { display: flex; }
+
+    /* ---- Side panel (TTS + page text) ---- */
+    #sidePanel {
+      flex: 0 0 270px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 0.875rem;
+      line-height: 1.55;
+    }
+
+    #pageTitle {
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      font-weight: normal;
+      margin: 0 0 12px;
+      color: var(--text-dark);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .panel-section {
+      margin-bottom: 14px;
+    }
+    .panel-section h3 {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-light);
+      margin: 0 0 5px;
+    }
+    .panel-text {
+      color: var(--text-mid);
+      font-size: 0.82rem;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .panel-text:empty::before {
+      content: "No text for this page.";
+      color: var(--text-light);
+      font-style: italic;
+    }
+
+    /* TTS controls */
+    .tts-section {
+      margin-top: 12px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+    #readBtn {
+      width: 100%;
+      justify-content: center;
+      padding: 8px;
+      font-size: 0.875rem;
+    }
+    #audioStatus {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--text-light);
+      text-align: center;
+      margin-top: 4px;
+      min-height: 1em;
+    }
+
+    /* Speed controls */
+    .speed-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--text-mid);
+    }
+    #speedLabel {
+      min-width: 38px;
+      text-align: center;
+      font-weight: 500;
+      color: var(--text-dark);
+    }
+
+    /* ---- Full-page error (magazine not found) ---- */
+    #fullError {
+      display: none;
+      max-width: 480px;
+      margin: 80px auto;
+      padding: 0 24px;
+      text-align: center;
+      color: var(--text-mid);
+    }
+    #fullError .icon { font-size: 3rem; display: block; margin-bottom: 16px; }
+    #fullError h2 {
+      font-family: var(--font-serif);
+      font-weight: normal;
+      margin: 0 0 8px;
+      color: var(--text-dark);
+    }
+    #fullError.visible { display: block; }
+    #layout.hidden, header.hidden { display: none; }
+
+    /* ---- RESPONSIVE: Mobile ---- */
+    @media (max-width: 860px) {
+      #layout {
+        flex-direction: column;
+        margin: 12px auto 36px;
+        padding: 0 12px;
+      }
+      #stageWrap {
+        width: 100%;
+      }
+      #sidePanel {
+        flex: none;
+        width: 100%;
+      }
+      #magTitle { max-width: 160px; }
+      .reader-header {
+        padding: 8px 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .bar-seg.downloads { display: none; } /* Hide download buttons on very small screens */
+    }
+
+    /* ---- Keyboard hint ---- */
+    .kbd-hint {
+      font-size: 0.7rem;
+      color: var(--text-light);
+      margin-top: 10px;
+      text-align: center;
+      line-height: 1.6;
+    }
+    kbd {
+      background: #F0EDE8;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0 4px;
+      font-size: 0.65rem;
+      font-family: var(--font-sans);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER TOOLBAR
+     ============================================================ -->
+<header class="site-header" role="banner" id="readerHeader">
+  <div class="reader-header" role="toolbar" aria-label="Reader controls">
+
+    <!-- Left: Back + title -->
+    <div class="bar-seg">
+      <a href="index.html" class="btn" aria-label="Back to archive">← Archive</a>
+      <div class="divider"></div>
+      <span id="magTitle">Loading…</span>
+    </div>
+
+    <!-- Middle: Navigation (grows to fill space) -->
+    <div class="bar-seg bar-seg-grow" style="justify-content: center;">
+      <button class="btn btn-icon" id="prevBtn" aria-label="Previous page" title="Previous page (← Arrow)">←</button>
+      <div class="page-nav">
+        <label for="pageInput" class="sr-only">Page number</label>
+        <input id="pageInput" type="number" min="1" value="1" aria-label="Current page">
+        <span aria-hidden="true">of</span>
+        <span id="totalPages" aria-live="polite">?</span>
+      </div>
+      <button class="btn btn-icon" id="nextBtn" aria-label="Next page" title="Next page (→ Arrow)">→</button>
+    </div>
+
+    <!-- Right: Zoom + downloads -->
+    <div class="bar-seg">
+      <button class="btn btn-icon" id="fitBtn"   title="Fit to screen [F]">⊞ Fit</button>
+      <button class="btn btn-icon" id="zoomOut"  aria-label="Zoom out" title="Zoom out [−]">−</button>
+      <span id="zoomLabel">100%</span>
+      <button class="btn btn-icon" id="zoomIn"   aria-label="Zoom in" title="Zoom in [+]">+</button>
+    </div>
+
+    <div class="bar-seg downloads">
+      <div class="divider"></div>
+      <a id="downloadBtn" class="btn" href="#" download aria-label="Download PDF">↓ PDF</a>
+      <a id="openPdfBtn"  class="btn" href="#" target="_blank" rel="noopener" aria-label="Open PDF in new tab">Open PDF ↗</a>
+    </div>
+
+    <span id="statusMsg" aria-live="polite"></span>
+  </div>
+</header>
+
+<!-- ============================================================
+     FULL-PAGE ERROR (shown if magazine not found)
+     ============================================================ -->
+<div id="fullError" role="alert">
+  <span class="icon">📭</span>
+  <h2 id="errorHeading">Magazine not found</h2>
+  <p id="errorDetail"></p>
+  <a href="index.html" class="btn btn-accent" style="margin-top:12px; display:inline-flex;">← Back to Archive</a>
+</div>
+
+<!-- ============================================================
+     MAIN LAYOUT: Flipbook + Side Panel
+     ============================================================ -->
+<div id="layout">
+
+  <!-- Flipbook stage -->
+  <main id="stageWrap" aria-label="Magazine flipbook">
+    <div id="stage">
+      <div id="book" role="img" aria-label="Magazine pages"></div>
+    </div>
+
+    <!-- Error state inside stage -->
+    <div id="stageError" role="alert">
+      <span class="err-icon">🖼️</span>
+      <strong>Could not load page images.</strong>
+      <p style="font-size:0.85rem; color:var(--text-light)">
+        Check that images exist in <code>pages/{id}/</code>.
+      </p>
+      <a id="fallbackPdfBtn" class="btn btn-accent" href="#" target="_blank">Open PDF instead ↗</a>
+    </div>
+  </main>
+
+  <!-- Side panel: TTS + page text -->
+  <aside id="sidePanel" aria-label="Page content and controls">
+
+    <!-- Page title -->
+    <div id="pageTitle">Page 1</div>
+
+    <!-- Page body text -->
+    <div class="panel-section">
+      <h3>Page Text</h3>
+      <div class="panel-text" id="pageText" aria-live="polite"></div>
+    </div>
+
+    <!-- Captions / alt text -->
+    <div class="panel-section">
+      <h3>Captions</h3>
+      <div class="panel-text" id="captionText" aria-live="polite"></div>
+    </div>
+
+    <!-- Text-to-speech controls -->
+    <div class="tts-section">
+      <button class="btn" id="readBtn" aria-label="Read this page aloud">🔊 Read this page</button>
+      <small id="audioStatus" aria-live="polite"></small>
+
+      <div class="speed-row" role="group" aria-label="Speech speed">
+        <span>Speed:</span>
+        <button class="btn btn-icon" id="speedDown" aria-label="Decrease speed">−</button>
+        <span id="speedLabel" aria-live="polite">1.0×</span>
+        <button class="btn btn-icon" id="speedUp"   aria-label="Increase speed">+</button>
+      </div>
+    </div>
+
+    <!-- Keyboard hint -->
+    <p class="kbd-hint">
+      <kbd>←</kbd><kbd>→</kbd> turn pages &nbsp;·&nbsp;
+      <kbd>+</kbd><kbd>−</kbd> zoom &nbsp;·&nbsp;
+      <kbd>F</kbd> fit
+    </p>
+  </aside>
+
+</div><!-- /#layout -->
+
+
+<!-- StPageFlip library (primary CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.min.js"></script>
+<script>
+  /* Fallback CDN if jsdelivr is blocked */
+  if (typeof St === 'undefined' && typeof PageFlip === 'undefined') {
+    const s = document.createElement('script');
+    s.src = 'https://unpkg.com/page-flip/dist/js/page-flip.browser.min.js';
+    document.head.appendChild(s);
+  }
+</script>
+
+<script>
+  /* ================================================================
+     READER PAGE — JAVASCRIPT
+     ----------------------------------------------------------------
+     ✋ FUTURE EMPLOYEES: Do NOT edit this script.
+        To update magazine text/captions, edit the file:
+          data/pages/{magazine-id}.json
+        To add a new magazine, edit:
+          data/magazines.json
+     ================================================================ */
+
+  // ----------------------------------------------------------------
+  // DOM references
+  // ----------------------------------------------------------------
+  const magTitleEl    = document.getElementById('magTitle');
+  const prevBtn       = document.getElementById('prevBtn');
+  const nextBtn       = document.getElementById('nextBtn');
+  const pageInput     = document.getElementById('pageInput');
+  const totalPagesEl  = document.getElementById('totalPages');
+  const fitBtn        = document.getElementById('fitBtn');
+  const zoomInBtn     = document.getElementById('zoomIn');
+  const zoomOutBtn    = document.getElementById('zoomOut');
+  const zoomLabelEl   = document.getElementById('zoomLabel');
+  const statusMsg     = document.getElementById('statusMsg');
+  const downloadBtn   = document.getElementById('downloadBtn');
+  const openPdfBtn    = document.getElementById('openPdfBtn');
+  const fallbackPdfBtn= document.getElementById('fallbackPdfBtn');
+  const readBtn       = document.getElementById('readBtn');
+  const audioStatus   = document.getElementById('audioStatus');
+  const speedLabel    = document.getElementById('speedLabel');
+  const speedDownBtn  = document.getElementById('speedDown');
+  const speedUpBtn    = document.getElementById('speedUp');
+  const pageTitleEl   = document.getElementById('pageTitle');
+  const pageTextEl    = document.getElementById('pageText');
+  const captionTextEl = document.getElementById('captionText');
+  const stageWrap     = document.getElementById('stageWrap');
+  const stageEl       = document.getElementById('stage');
+  const bookEl        = document.getElementById('book');
+  const stageError    = document.getElementById('stageError');
+  const fullError     = document.getElementById('fullError');
+  const layout        = document.getElementById('layout');
+
+  // ----------------------------------------------------------------
+  // State
+  // ----------------------------------------------------------------
+  let book            = null;   // StPageFlip instance
+  let magazine        = null;   // Magazine config object from magazines.json
+  let pageData        = [];     // Per-page text data from data/pages/{id}.json
+  let pageImages      = [];     // Array of image URLs
+  let currentPageIdx  = 0;      // 0-based current page index
+  let zoomFactor      = 1.0;
+  let pageWidthCSS    = 450;
+  let pageHeightCSS   = 600;
+  let isSpeaking      = false;
+  let speechRate      = 1.0;
+  let currentUtterance= null;
+  const MAX_WIDTH     = 900;    // Maximum single-page width in CSS pixels
+
+  // ----------------------------------------------------------------
+  // UTILITY: Show a full-page error (magazine not found, etc.)
+  // ----------------------------------------------------------------
+  function showFullError(heading, detail) {
+    document.getElementById('errorHeading').textContent = heading;
+    document.getElementById('errorDetail').textContent  = detail;
+    fullError.classList.add('visible');
+    layout.classList.add('hidden');
+    document.getElementById('readerHeader').classList.add('hidden');
+  }
+
+  // ----------------------------------------------------------------
+  // UTILITY: Find the StPageFlip constructor across CDN variants
+  // ----------------------------------------------------------------
+  function getPageFlipCtor() {
+    return (window.St && window.St.PageFlip)
+        || window.PageFlip
+        || null;
+  }
+
+  // ----------------------------------------------------------------
+  // UTILITY: Wait for StPageFlip to load (polls up to 2 seconds)
+  // ----------------------------------------------------------------
+  function waitForPageFlip() {
+    return new Promise(resolve => {
+      let attempts = 0;
+      (function poll() {
+        const Ctor = getPageFlipCtor();
+        if (Ctor || attempts > 40) return resolve(Ctor || null);
+        attempts++;
+        setTimeout(poll, 50);
+      })();
+    });
+  }
+
+  // ----------------------------------------------------------------
+  // COMPUTE stage dimensions from first loaded image
+  // ----------------------------------------------------------------
+  function computeSizes(img) {
+    const wrapWidth = Math.min(stageWrap.clientWidth - 24, MAX_WIDTH);
+    pageWidthCSS    = Math.floor(wrapWidth / 2);
+    const ratio     = img.naturalHeight / img.naturalWidth;
+    pageHeightCSS   = Math.floor(pageWidthCSS * ratio);
+
+    stageEl.style.width  = (pageWidthCSS * 2) + 'px';
+    stageEl.style.height = pageHeightCSS + 'px';
+  }
+
+  // ----------------------------------------------------------------
+  // ZOOM: Apply zoom to the stage via CSS transform
+  // ----------------------------------------------------------------
+  function applyZoom() {
+    stageEl.style.transformOrigin = 'top left';
+    stageEl.style.transform       = `scale(${zoomFactor})`;
+    // Adjust stageWrap minimum height so it doesn't collapse
+    stageWrap.style.minHeight = (pageHeightCSS * zoomFactor + 24) + 'px';
+    zoomLabelEl.textContent   = Math.round(zoomFactor * 100) + '%';
+  }
+
+  function fitToScreen() {
+    const wrapWidth  = stageWrap.clientWidth - 24;
+    const spreadWidth = pageWidthCSS * 2;
+    zoomFactor = Math.max(0.5, Math.min(3, wrapWidth / spreadWidth));
+    applyZoom();
+  }
+
+  // ----------------------------------------------------------------
+  // PAGE TEXT: Update the side panel when page changes
+  // ----------------------------------------------------------------
+  function updateSidePanel(pageIndex) {
+    currentPageIdx = pageIndex;
+    const data     = pageData[pageIndex] || {};
+
+    pageTitleEl.textContent  = data.title    || `Page ${pageIndex + 1}`;
+    pageTextEl.textContent   = data.text     || '';
+    captionTextEl.textContent= data.captions || '';
+
+    // Stop TTS if page changes while reading
+    if (isSpeaking) stopReading();
+  }
+
+  // ----------------------------------------------------------------
+  // TEXT-TO-SPEECH
+  // ----------------------------------------------------------------
+  function stopReading() {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    isSpeaking        = false;
+    currentUtterance  = null;
+    readBtn.textContent = '🔊 Read this page';
+    readBtn.setAttribute('aria-label', 'Read this page aloud');
+    audioStatus.textContent = '';
+  }
+
+  function startReading() {
+    if (!('speechSynthesis' in window)) {
+      audioStatus.textContent = 'Text-to-speech not supported in this browser.';
+      return;
+    }
+
+    const data = pageData[currentPageIdx] || {};
+    const text = [data.title, data.text, data.captions].filter(Boolean).join('. ');
+
+    if (!text.trim()) {
+      audioStatus.textContent = 'No text available for this page.';
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.rate  = speechRate;
+    currentUtterance = utter;
+    isSpeaking  = true;
+
+    readBtn.textContent = '⏹ Stop reading';
+    readBtn.setAttribute('aria-label', 'Stop reading');
+    audioStatus.textContent = 'Reading…';
+
+    utter.onend = () => {
+      isSpeaking = false;
+      currentUtterance = null;
+      readBtn.textContent = '🔊 Read this page';
+      readBtn.setAttribute('aria-label', 'Read this page aloud');
+      audioStatus.textContent = 'Finished.';
+      setTimeout(() => { audioStatus.textContent = ''; }, 2000);
+    };
+    utter.onerror = () => {
+      stopReading();
+      audioStatus.textContent = 'Error during speech.';
+    };
+
+    window.speechSynthesis.speak(utter);
+  }
+
+  // ----------------------------------------------------------------
+  // INITIALIZE FLIPBOOK
+  // ----------------------------------------------------------------
+  async function initFlipbook(images, PageFlipCtor) {
+    // Load first image to get dimensions
+    statusMsg.textContent = 'Loading pages…';
+
+    const img0 = new Image();
+    img0.src   = images[0];
+
+    const loaded = await new Promise(resolve => {
+      img0.onload  = () => resolve(true);
+      img0.onerror = () => resolve(false);
+    });
+
+    if (!loaded) {
+      statusMsg.textContent = '';
+      stageError.classList.add('visible');
+      return;
+    }
+
+    computeSizes(img0);
+    statusMsg.textContent = '';
+
+    // Create StPageFlip instance
+    book = new PageFlipCtor(bookEl, {
+      width:             pageWidthCSS,
+      height:            pageHeightCSS,
+      size:              'stretch',
+      showCover:         true,
+      usePortrait:       true,
+      maxShadowOpacity:  0.15,
+      flippingTime:      550
+    });
+
+    book.loadFromImages(images);
+    totalPagesEl.textContent = images.length;
+    pageInput.value          = '1';
+    pageInput.max            = String(images.length);
+    updateSidePanel(0);
+
+    // ---- Book events ----
+    book.on('flip', e => {
+      const idx = e.data;
+      pageInput.value = String(idx + 1);
+      updateSidePanel(idx);
+    });
+
+    // ---- Navigation ----
+    prevBtn.onclick = () => book.flipPrev();
+    nextBtn.onclick = () => book.flipNext();
+
+    pageInput.addEventListener('change', () => {
+      const n = Math.max(1, Math.min(images.length, parseInt(pageInput.value, 10) || 1));
+      pageInput.value = String(n);
+      book.flip(n - 1);
+    });
+
+    // ---- Zoom ----
+    zoomInBtn.onclick  = () => {
+      zoomFactor = Math.min(3.0, +(zoomFactor + 0.15).toFixed(2));
+      applyZoom();
+    };
+    zoomOutBtn.onclick = () => {
+      zoomFactor = Math.max(0.4, +(zoomFactor - 0.15).toFixed(2));
+      applyZoom();
+    };
+    fitBtn.onclick = fitToScreen;
+
+    // ---- TTS ----
+    readBtn.onclick = () => isSpeaking ? stopReading() : startReading();
+
+    speedDownBtn.onclick = () => {
+      speechRate = Math.max(0.5, +(speechRate - 0.25).toFixed(2));
+      speedLabel.textContent = speechRate.toFixed(2).replace('.00', '') + '×';
+      if (currentUtterance) currentUtterance.rate = speechRate;
+    };
+    speedUpBtn.onclick = () => {
+      speechRate = Math.min(2.5, +(speechRate + 0.25).toFixed(2));
+      speedLabel.textContent = speechRate.toFixed(2).replace('.00', '') + '×';
+      if (currentUtterance) currentUtterance.rate = speechRate;
+    };
+
+    // ---- Initial zoom (fit to screen) ----
+    fitToScreen();
+
+    // ---- Handle window resize ----
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (!book) return;
+        const currentPage = book.getCurrentPageIndex();
+        computeSizes(img0);
+
+        const oldBook = book;
+        book = new PageFlipCtor(bookEl, {
+          width: pageWidthCSS, height: pageHeightCSS,
+          size: 'stretch', showCover: true, usePortrait: true,
+          maxShadowOpacity: 0.15, flippingTime: 550
+        });
+        oldBook.destroy();
+        book.loadFromImages(images);
+
+        book.on('flip', e => {
+          pageInput.value = String(e.data + 1);
+          updateSidePanel(e.data);
+        });
+
+        book.turnToPage(currentPage);
+        fitToScreen();
+      }, 200);
+    });
+  }
+
+  // ----------------------------------------------------------------
+  // MAIN ENTRY POINT: load magazine config then init
+  // ----------------------------------------------------------------
+  async function main() {
+
+    // 1. Get magazine ID from URL  ?id=mentor-magic-spring-2026
+    const params = new URLSearchParams(window.location.search);
+    const magId  = params.get('id');
+
+    if (!magId) {
+      showFullError('No magazine selected.', 'Please return to the archive and choose an issue.');
+      return;
+    }
+
+    // 2. Load magazine list from config
+    let magList;
+    try {
+      const res = await fetch('data/magazines.json');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      magList = await res.json();
+    } catch (err) {
+      showFullError('Could not load magazine data.', `Error: ${err.message}`);
+      return;
+    }
+
+    // 3. Find this magazine
+    magazine = magList.find(m => m.id === magId);
+    if (!magazine) {
+      showFullError(
+        `Magazine "${magId}" not found.`,
+        'It may have been removed, or the ID in the URL is incorrect.'
+      );
+      return;
+    }
+
+    // 4. Update page title and PDF links
+    document.title        = `${magazine.title} — Mentor Magic`;
+    magTitleEl.textContent = magazine.title;
+    downloadBtn.href       = magazine.pdf || '#';
+    downloadBtn.download   = `${magazine.id}.pdf`;
+    openPdfBtn.href        = magazine.pdf || '#';
+    fallbackPdfBtn.href    = magazine.pdf || '#';
+
+    // Disable download links if no PDF
+    if (!magazine.pdf) {
+      downloadBtn.style.opacity = '0.4';
+      downloadBtn.style.pointerEvents = 'none';
+      openPdfBtn.style.opacity = '0.4';
+      openPdfBtn.style.pointerEvents = 'none';
+    }
+
+    // 5. Load per-page text data (optional — fails gracefully)
+    try {
+      const res = await fetch(`data/pages/${magazine.id}.json`);
+      if (res.ok) {
+        pageData = await res.json();
+      }
+    } catch (_) {
+      // Page text is optional. Silently skip if unavailable.
+      pageData = [];
+    }
+
+    // 6. Build page image URLs
+    const count  = magazine.pageCount || 0;
+    if (count < 1) {
+      statusMsg.textContent = 'Warning: pageCount not set in magazines.json';
+    }
+    pageImages = Array.from(
+      { length: count },
+      (_, i) => `pages/${magazine.id}/page-${i + 1}.jpg`
+    );
+
+    // 7. Wait for StPageFlip, then initialize flipbook
+    const PageFlipCtor = await waitForPageFlip();
+    if (!PageFlipCtor) {
+      stageError.classList.add('visible');
+      stageError.querySelector('strong').textContent = 'StPageFlip library could not load.';
+      statusMsg.textContent = 'CDN may be blocked.';
+      return;
+    }
+
+    await initFlipbook(pageImages, PageFlipCtor);
+  }
+
+  // ----------------------------------------------------------------
+  // KEYBOARD CONTROLS
+  // ----------------------------------------------------------------
+  document.addEventListener('keydown', e => {
+    // Don't intercept keys while typing in inputs
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.target.isContentEditable) return;
+    if (!book) return;
+
+    switch (e.code) {
+      case 'ArrowRight':
+        e.preventDefault();
+        book.flipNext();
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        book.flipPrev();
+        break;
+      case 'Space':
+        e.preventDefault();
+        e.shiftKey ? book.flipPrev() : book.flipNext();
+        break;
+      case 'NumpadAdd':
+        e.preventDefault();
+        zoomInBtn.click();
+        break;
+      case 'NumpadSubtract':
+        e.preventDefault();
+        zoomOutBtn.click();
+        break;
+      default:
+        if (e.key === '+' || (e.key === '=' && e.shiftKey)) {
+          e.preventDefault(); zoomInBtn.click();
+        } else if (e.key === '-') {
+          e.preventDefault(); zoomOutBtn.click();
+        } else if (e.key === 'f' || e.key === 'F') {
+          e.preventDefault(); fitBtn.click();
+        }
+    }
+  });
+
+  // ----------------------------------------------------------------
+  // RUN
+  // ----------------------------------------------------------------
+  main();
+</script>
+</body>
+</html>
