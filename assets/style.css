@@ -104,7 +104,7 @@ img {
 .btn-accent:hover {
   background: var(--accent-hover);
   border-color: var(--accent-hover);
-  color: #6cc24a;
+  color: #ff9900;
 }
 .btn-icon {
   padding: 7px 10px;
