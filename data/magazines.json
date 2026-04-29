@@ -1,32 +1,52 @@
 [
   {
+    "id":          "take-charge-fall-2023",
+    "title":       "Take Charge, Fall 2023",
+    "year":        "2023",
+    "category":    "Fall Issue",
+    "pageCount":   16,
+    "pdf":         "magazines/take-charge-fall-2023",
+    "cover":       "covers/take-charge-fall-2023.jpg",
+    "description": "take charge"
+  },
+  {
+    "id":          "dream-big-spring-2024",
+    "title":       "Dream Big, Spring 2024",
+    "year":        "2024",
+    "category":    "Spring Issue",
+    "pageCount":   16,
+    "pdf":         "magazines/dream-big-spring-2024.pdf",
+    "cover":       "covers/mentor-magic-fall-2025.jpg",
+    "description": "dream big"
+  },
+  {
+    "id":          "find-your-edge-fall-2024",
+    "title":       "Find Your Edge, Fall 2024",
+    "year":        "2024",
+    "category":    "Fall Issue",
+    "pageCount":   16,
+    "pdf":         "magazines/find-your-edge-fall-2024.pdf",
+    "cover":       "covers/find-your-edge-fall-2024.jpg",
+    "description": "find your edge blah blah"
+  },
+  {
+    "id":          "arts-issue-fall-2025",
+    "title":       "The Arts Issue, Fall 2025",
+    "year":        "2025",
+    "category":    "Fall Issue",
+    "pageCount":   9,
+    "pdf":         "magazines/arts-issue-fall-2025.pdf",
+    "cover":       "covers/arts-issue-fall-2025.jpg",
+    "description": "Explore the wonders of art or something"
+  },
+  {
     "id":          "mentor-magic-spring-2025",
-    "title":       "Mentor Magic — Spring 2025",
+    "title":       "Mentor Magic, spring 2025",
     "year":        "2025",
     "category":    "Spring Issue",
     "pageCount":   16,
     "pdf":         "magazines/mentor-magic-spring-2025.pdf",
     "cover":       "covers/mentor-magic-spring-2025.jpg",
-    "description": "Spring issue featuring mentorship stories and program highlights."
-  },
-  {
-    "id":          "[Placeholder: sharpur-Edge-fall-2025]",
-    "title":       "Sharpur Edge — Fall 2025",
-    "year":        "2025",
-    "category":    "Fall Issue",
-    "pageCount":   20,
-    "pdf":         "magazines/mentor-magic-fall-2025.pdf",
-    "cover":       "covers/mentor-magic-fall-2025.jpg",
-    "description": "Fall 2025 issue with stories from the new cohort."
-  },
-  {
-    "id":          "sharpur-edge-spring-2025",
-    "title":       "Sharpur Edge — Spring 2026",
-    "year":        "2025",
-    "category":    "Spring Issue",
-    "pageCount":   18,
-    "pdf":         "magazines/mentor-magic-spring-2025.pdf",
-    "cover":       "covers/mentor-magic-spring-2025.jpg",
-    "description": "Our inaugural issue celebrating the program's launch."
+    "description": "so much mentor magic"
   }
-]
+  ]
