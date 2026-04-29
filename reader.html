@@ -100,7 +100,7 @@
       background: #DDDAD5;
       border-radius: 8px;
       padding: 12px;
-      overflow: auto;
+      overflow: hidden;
     }
     #stage {
       margin: 0 auto;
@@ -509,17 +509,19 @@
   // ZOOM: Apply zoom to the stage via CSS transform
   // ----------------------------------------------------------------
   function applyZoom() {
-    stageEl.style.transformOrigin = 'top left';
+    // Scale from top-center so zoom expands outward symmetrically
+    stageEl.style.transformOrigin = 'top center';
     stageEl.style.transform       = `scale(${zoomFactor})`;
-    // Adjust stageWrap minimum height so it doesn't collapse
-    stageWrap.style.minHeight = (pageHeightCSS * zoomFactor + 24) + 'px';
-    zoomLabelEl.textContent   = Math.round(zoomFactor * 100) + '%';
+
+    // Expand the wrapper to match the scaled height so nothing gets clipped
+    stageWrap.style.height   = (pageHeightCSS * zoomFactor + 24) + 'px';
+    stageWrap.style.overflow = zoomFactor > 1 ? 'auto' : 'hidden';
+
+    zoomLabelEl.textContent = Math.round(zoomFactor * 100) + '%';
   }
 
   function fitToScreen() {
-    const wrapWidth  = stageWrap.clientWidth - 24;
-    const spreadWidth = pageWidthCSS * 2;
-    zoomFactor = Math.max(0.5, Math.min(3, wrapWidth / spreadWidth));
+    zoomFactor = 1.0;
     applyZoom();
   }
 
@@ -674,8 +676,9 @@
       if (currentUtterance) currentUtterance.rate = speechRate;
     };
 
-    // ---- Initial zoom (fit to screen) ----
-    fitToScreen();
+    // ---- Initial zoom: 100% ----
+    zoomFactor = 1.0;
+    applyZoom();
 
     // ---- Handle window resize ----
     let resizeTimer;
