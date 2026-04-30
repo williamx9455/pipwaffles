@@ -1,7 +1,7 @@
 [
   {
     "id":          "take-charge-fall-2023",
-    "title":       "Take Charge, Fall 2023",
+    "title":       "Take Charge",
     "year":        "2023",
     "category":    "Fall Issue",
     "pageCount":   16,
@@ -11,7 +11,7 @@
   },
   {
     "id":          "dream-big-spring-2024",
-    "title":       "Dream Big, Spring 2024",
+    "title":       "Dream Big",
     "year":        "2024",
     "category":    "Spring Issue",
     "pageCount":   16,
@@ -21,7 +21,7 @@
   },
   {
     "id":          "find-your-edge-fall-2024",
-    "title":       "Find Your Edge, Fall 2024",
+    "title":       "Find Your Edge",
     "year":        "2024",
     "category":    "Fall Issue",
     "pageCount":   16,
@@ -31,7 +31,7 @@
   },
   {
     "id":          "arts-issue-fall-2025",
-    "title":       "The Arts Issue, Fall 2025",
+    "title":       "The Arts Issue",
     "year":        "2025",
     "category":    "Fall Issue",
     "pageCount":   14,
@@ -41,7 +41,7 @@
   },
   {
     "id":          "mentor-magic-spring-2025",
-    "title":       "Mentor Magic, spring 2025",
+    "title":       "Mentor Magic",
     "year":        "2025",
     "category":    "Spring Issue",
     "pageCount":   16,
