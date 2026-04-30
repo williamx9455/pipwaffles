@@ -1,116 +1,105 @@
-# Mentor Magic — Magazine Archive
+# Sharpur Edge Magazine Archive
 
-A simple, maintainable magazine flipbook system.
+A static magazine archive and flipbook reader for Sharpur Edge.
 
----
+The site uses **lightly lossy WebP** page and cover images for a strong balance of browser legibility and file size. PDFs remain available for download/opening, but the flipbook itself reads generated WebP images.
 
-## Quick Start: Adding a New Magazine
+## Quick Start: Adding A New Magazine
 
-This is the most common task. It takes about 5 minutes.
+### 1. Add the PDF
 
-**Step 1 — Drop the PDF into the `magazines/` folder**
+Drop the PDF into `magazines/`.
 
-```
+```text
 magazines/
-  mentor-magic-fall-2026.pdf   ← your new PDF goes here
+  mentor-magic-fall-2026.pdf
 ```
 
-Name it clearly: `mentor-magic-fall-2026.pdf`, `mentor-magic-spring-2027.pdf`, etc.
+Name PDFs with clean words and dates, such as `mentor-magic-fall-2026.pdf`.
 
----
+### 2. Generate WebP Assets
 
-**Step 2 — Run the conversion script**
+Run this from the project root:
 
-Open a terminal in the root project folder and run:
+```bash
+python scripts/generate-webp.py magazines/mentor-magic-fall-2026.pdf
+```
+
+The old command also works and now delegates to the WebP converter:
 
 ```bash
 python scripts/generate-pages.py magazines/mentor-magic-fall-2026.pdf
 ```
-> replace "mentor-magic-fall-2026 with whatever name your ACTUAL PDF file is.
-
-> If you get "command not found" errors, first run:
-> `pip install PyMuPDF Pillow`
-> `pip install fitz`
 
 The script will:
-- Convert every PDF page to a JPEG image (saved to `pages/mentor-magic-fall-2026/`)
-- Create a cover image (saved to `covers/mentor-magic-fall-2026.jpg`)
-- Print a JSON snippet for you to copy (see Step 3)
-- Create a page-text template file (see Step 4)
 
----
+- Convert every PDF page to WebP images in `pages/{id}/`.
+- Create a WebP cover at `covers/{id}.webp`.
+- Create `data/pages/{id}.json` if it does not already exist.
+- Preserve existing page text/caption JSON by default.
+- Print a JSON snippet for `data/magazines.json`.
 
-**Step 3 — Add the entry to `data/magazines.json`**
+By default, pages render at 300 DPI, covers render at 200 DPI, and lossy WebP quality is 82. You can override those values:
 
-The script prints something like this:
+```bash
+python scripts/generate-webp.py magazines/mentor-magic-fall-2026.pdf --page-dpi 450 --cover-dpi 300 --quality 90
+```
+
+Higher page DPI/quality can improve tiny text, but it also makes files larger. Use `--lossless` only when you really need artifact-free source images.
+
+Install dependencies once if needed:
+
+```bash
+pip install PyMuPDF Pillow
+```
+
+### 3. Add The Magazine Entry
+
+Open `data/magazines.json` and add the snippet printed by the script.
+
+Example:
 
 ```json
 {
-  "id":          "mentor-magic-fall-2026",
-  "title":       "Mentor Magic — Season Year",
-  "year":        "2026",
-  "category":    "Spring Issue",
-  "pageCount":   18,
-  "pdf":         "magazines/mentor-magic-fall-2026.pdf",
-  "cover":       "covers/mentor-magic-fall-2026.jpg",
-  "description": "A short description of this issue."
+  "id": "mentor-magic-fall-2026",
+  "title": "Mentor Magic, Fall 2026",
+  "year": "2026",
+  "category": "Fall Issue",
+  "pageCount": 18,
+  "pdf": "magazines/mentor-magic-fall-2026.pdf",
+  "cover": "covers/mentor-magic-fall-2026.webp",
+  "description": "Fall issue featuring new mentor cohort stories."
 }
 ```
 
-Open `data/magazines.json` and paste this inside the `[ ]` array,
-then update the title, year, category, and description.
+Make sure:
 
-**Example — what the file looks like after adding:**
+- `id` matches the generated folder under `pages/`.
+- `pageCount` matches the number of generated WebP page files.
+- `cover` points to `.webp`, not `.jpg`.
+
+### 4. Add Page Text
+
+Open `data/pages/{id}.json` and fill in `text` and `captions` when available.
+
+This powers the reader side panel and text-to-speech.
 
 ```json
 [
   {
-    "id":          "mentor-magic-fall-2026",
-    "title":       "Mentor Magic — Fall 2026",
-    "year":        "2026",
-    "category":    "Fall Issue",
-    "pageCount":   18,
-    "pdf":         "magazines/mentor-magic-fall-2026.pdf",
-    "cover":       "covers/mentor-magic-fall-2026.jpg",
-    "description": "Fall issue featuring new mentor cohort stories."
+    "title": "Cover - Mentor Magic Fall 2026",
+    "text": "The main text printed on the cover goes here.",
+    "captions": "Describe the cover image and layout."
   },
   {
-    "id":          "mentor-magic-spring-2026",
-    ... (existing entry)
+    "title": "Page 2",
+    "text": "The body text from page 2 goes here.",
+    "captions": "Describe any photos or illustrations on this page."
   }
 ]
 ```
 
----
-
-**Step 4 — (Optional but recommended) Fill in page text**
-
-The script created a file at `data/pages/mentor-magic-fall-2026.json`.
-
-Open it and fill in the `text` and `captions` fields for each page.
-This powers the **text-to-speech** feature and improves accessibility.
-
-You don't have to fill in every page. Empty pages just show nothing in the panel.
-
-```json
-[
-  {
-    "title":    "Cover — Mentor Magic Fall 2026",
-    "text":     "The main text printed on the cover goes here.",
-    "captions": "Describe what's visually on the cover: the image, colors, layout."
-  },
-  {
-    "title":    "Page 2",
-    "text":     "The body text from page 2 goes here.",
-    "captions": "Describe any photos or illustrations on this page."
-  },
-  ...
-]
-```
-
----
-
-**Step 5 — Commit and push to GitHub**
+### 5. Commit And Push
 
 ```bash
 git add .
@@ -118,167 +107,148 @@ git commit -m "Add Fall 2026 issue"
 git push
 ```
 
-GitHub Pages will update automatically within a minute or two.
-
----
+GitHub Pages will update after the push.
 
 ## File Structure
 
-```
-/                          ← Root of project
-├── index.html             ← Archive page (DO NOT EDIT)
-├── reader.html            ← Flipbook reader (DO NOT EDIT)
+```text
+/
+├── index.html                  Archive page
+├── reader.html                 Flipbook reader
 ├── assets/
-│   └── style.css          ← Design colors/fonts (edit to rebrand)
+│   ├── style.css               Shared colors, fonts, and components
+│   ├── sharpur-edge-logo.svg
+│   ├── pips/
+│   └── fonts/
 ├── data/
-│   ├── magazines.json     ← EDIT THIS to add/remove magazines
+│   ├── magazines.json          Magazine list and metadata
 │   └── pages/
-│       └── {id}.json      ← EDIT THESE for per-page text/captions
-├── magazines/             ← Drop PDFs here
-├── covers/                ← Auto-generated by script (don't edit manually)
-├── pages/                 ← Auto-generated by script (don't edit manually)
+│       └── {id}.json           Per-page text and captions
+├── magazines/
+│   └── {id}.pdf                Source PDFs
+├── covers/
+│   └── {id}.webp               Generated WebP covers
+├── pages/
 │   └── {id}/
-│       ├── page-1.jpg
-│       ├── page-2.jpg
+│       ├── page-1.webp
+│       ├── page-2.webp
 │       └── ...
 └── scripts/
-    └── generate-pages.py  ← The PDF converter script
+    ├── generate-webp.py        Canonical WebP converter
+    ├── generate-pages.py       Compatibility wrapper for generate-webp.py
+    └── generate-jpg.py         Legacy JPG converter
 ```
 
----
-
-## What You Should Edit
+## What To Edit
 
 | File | When to edit |
-|------|-------------|
-| `data/magazines.json` | Every time you add a new magazine |
-| `data/pages/{id}.json` | To add text-to-speech and captions per page |
-| `assets/style.css` → `:root{}` | To change site colors or accent color |
+| --- | --- |
+| `data/magazines.json` | Add, remove, rename, or describe magazines |
+| `data/pages/{id}.json` | Add page text/captions for accessibility and TTS |
+| `assets/style.css` | Change global site colors or styling |
 
----
+## What Not To Edit By Hand
 
-## What You Should NOT Edit
+| Path | Why |
+| --- | --- |
+| `covers/` | Generated by the converter |
+| `pages/` | Generated by the converter |
+| `index.html` | Core archive logic |
+| `reader.html` | Core reader logic |
 
-| File | Why not |
-|------|---------|
-| `index.html` | Core archive logic — editing can break the site |
-| `reader.html` | Core reader logic — editing can break the site |
-| `covers/` folder | Auto-generated by script |
-| `pages/` folder | Auto-generated by script |
+## Local Testing
 
----
-
-## Rebranding / Changing Colors
-
-To change the site's accent color, open `assets/style.css` and find the `:root {}` block near the top. Change the `--accent` value:
-
-```css
-:root {
-  --accent: #a7da92;   /* ← Change this to your preferred color, maybe even update it seasonally? */
-}
-```
-
-That one change updates buttons, hover states, and active filters across the whole site.
-
----
-
-## Updating a Magazine Cover
-
-If you need to replace a cover image without re-running the full script:
-
-1. Export your cover as a JPEG (roughly 850×1100 pixels is ideal).
-2. Name it `{magazine-id}.jpg` (use the same ID as in `magazines.json`).
-3. Drop it into the `covers/` folder (overwrite the existing file).
-4. Commit and push.
-
----
-
-## Updating a Magazine Title or Description
-
-Open `data/magazines.json`, find the entry by its `id`, and change the `title`, `year`, `category`, or `description` fields. Save, commit, push.
-
----
-
-## Removing a Magazine
-
-Open `data/magazines.json` and delete the entire `{ ... }` block for that magazine (including the trailing comma if needed). Then optionally remove the PDF, cover, pages folder, and page data file to save space.
-
----
-
-## Deploying to GitHub Pages
-
-1. Create a GitHub repository for this project.
-2. Push all files to the `main` branch.
-3. Go to **Settings → Pages** in your GitHub repository.
-4. Set the source to **Deploy from a branch** → `main` → `/ (root)`.
-5. Click Save. Your site will be live at `https://yourusername.github.io/your-repo-name/`.
-
-> **Important**: GitHub Pages requires files to be fetched from a server.
-> You cannot open `index.html` directly as a local file and expect it to work.
-> For local testing, use Python's built-in server:
-> ```bash
-> python -m http.server 8000
-> ```
-> Then open `http://localhost:8000` in your browser.
-
----
-
-## Requirements for the Conversion Script
-
-The script requires Python 3.7 or later and two libraries:
+Because the app uses `fetch()`, serve it from a local web server:
 
 ```bash
-pip install PyMuPDF Pillow
+python -m http.server 8000
 ```
 
-Run this once. After that, the script is ready.
+Then open:
 
----
+```text
+http://localhost:8000
+```
+
+Opening `index.html` directly from the filesystem will not reliably load JSON.
+
+## Updating An Existing Magazine
+
+To regenerate WebP images from an updated PDF:
+
+```bash
+python scripts/generate-webp.py magazines/existing-issue.pdf
+```
+
+By default, existing `data/pages/{id}.json` text is preserved.
+
+To intentionally reset the page text template:
+
+```bash
+python scripts/generate-webp.py magazines/existing-issue.pdf --overwrite-page-data
+```
+
+Use that reset option carefully because it replaces existing accessibility/TTS text.
+
+## Updating A Cover Only
+
+If replacing a cover manually, export it as WebP and save it as:
+
+```text
+covers/{magazine-id}.webp
+```
+
+Then make sure the matching `data/magazines.json` entry points to that file.
 
 ## Shareable URLs
 
-Each magazine has a unique URL you can share:
+Each issue can be linked directly:
 
+```text
+https://your-site.com/reader.html?id=mentor-magic-spring-2025
 ```
-https://your-site.com/reader.html?id=mentor-magic-spring-2026
-```
 
-The `id` matches the `id` field in `data/magazines.json`.
-
----
+The `id` must match an entry in `data/magazines.json`.
 
 ## Troubleshooting
 
-**The site shows "Could not load magazines"**
-- Make sure you're running from a web server, not opening the file directly.
-- Check that `data/magazines.json` exists and contains valid JSON.
-- Use a JSON validator (jsonlint.com) if unsure.
+### The site shows "Could not load magazines"
 
-**Images don't appear in the flipbook**
-- Make sure you ran the conversion script.
-- Check that the `pages/{id}/` folder contains `page-1.jpg`, `page-2.jpg`, etc.
-- Check the `pageCount` in `magazines.json` matches the actual number of image files.
+- Make sure the site is served from a web server.
+- Check that `data/magazines.json` exists.
+- Check that `data/magazines.json` is valid JSON.
 
-**Cover doesn't appear on archive page**
-- Check that `covers/{id}.jpg` exists.
-- If the cover path in `magazines.json` is wrong, fix it. Paths are relative to the root.
+### Images do not appear in the flipbook
 
-**Script error: "fitz not found"**
-- Run: `pip install PyMuPDF`
+- Make sure `pages/{id}/page-1.webp`, `page-2.webp`, etc. exist.
+- Make sure `pageCount` matches the number of generated WebP page files.
+- Make sure `reader.html` is using the same `id` as `data/magazines.json`.
 
-**Text-to-speech isn't working**
-- TTS requires a browser that supports the Web Speech API (Chrome, Edge, Safari).
-- Firefox has limited support.
-- Make sure the page is loaded over HTTPS or localhost (not `file://`).
+### Covers do not appear
 
----
+- Make sure `covers/{id}.webp` exists.
+- Make sure `data/magazines.json` points to the `.webp` cover path.
+
+### Script error: "fitz not found"
+
+Install PyMuPDF:
+
+```bash
+pip install PyMuPDF
+```
+
+### Text-to-speech is not working
+
+- TTS requires a browser that supports the Web Speech API.
+- Chrome, Edge, and Safari have the best support.
+- Use HTTPS or localhost, not `file://`.
 
 ## Reader Keyboard Shortcuts
 
 | Key | Action |
-|-----|--------|
-| `→` or `Space` | Next page |
-| `←` or `Shift+Space` | Previous page |
+| --- | --- |
+| Right arrow or Space | Next page |
+| Left arrow or Shift+Space | Previous page |
 | `+` | Zoom in |
 | `-` | Zoom out |
 | `F` | Fit to screen |

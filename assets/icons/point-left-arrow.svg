@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 135.58 59.22">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke: #000;
+        stroke-miterlimit: 10;
+        stroke-width: 1.37px;
+      }
+    </style>
+  </defs>
+  <g>
+    <rect x="38.81" y="20.92" width="94.45" height="22.86"/>
+    <path d="M132.7,21.48v21.74H39.37v-21.74h93.33M133.82,20.36H38.25v23.98h95.57v-23.98h0Z"/>
+  </g>
+  <polygon class="cls-1" points="42.43 10.64 3.37 32.35 42.43 54.06 42.43 10.64"/>
+</svg>

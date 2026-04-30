@@ -36,6 +36,29 @@
     }
     .bar-seg-grow { flex: 1 1 auto; }
 
+    .btn-icon img {
+      width: 18px;
+      height: 18px;
+      display: block;
+      object-fit: contain;
+    }
+    #prevBtn,
+    #nextBtn {
+      width: 36px;
+      min-width: 36px;
+      color: transparent;
+      font-size: 0;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 18px 18px;
+    }
+    #prevBtn {
+      background-image: url("assets/icons/point-left-arrow.svg");
+    }
+    #nextBtn {
+      background-image: url("assets/icons/point-right-arrow.svg");
+    }
+
     /* Magazine title in header */
     #magTitle {
       font-family: var(--font-serif);
@@ -86,21 +109,24 @@
     /* ---- MAIN LAYOUT: flipbook + side panel ---- */
     #layout {
       display: flex;
-      gap: 16px;
+      flex-wrap: wrap;
+      gap: 20px 28px;
       align-items: flex-start;
-      max-width: 1400px;
+      justify-content: center;
+      max-width: none;
       margin: 16px auto 48px;
       padding: 0 16px;
     }
 
     /* ---- Flipbook stage ---- */
     #stageWrap {
-      flex: 1 1 auto;
-      min-width: 0;
+      flex: 0 1 auto;
+      width: max-content;
+      max-width: calc(100vw - 32px);
       background: #DDDAD5;
       border-radius: 8px;
       padding: 12px;
-      overflow: hidden;
+      overflow: auto;
     }
     #stage {
       margin: 0 auto;
@@ -130,7 +156,8 @@
 
     /* ---- Side panel (TTS + page text) ---- */
     #sidePanel {
-      flex: 0 0 270px;
+      flex: 0 0 300px;
+      max-width: calc(100vw - 32px);
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -139,7 +166,18 @@
       line-height: 1.55;
     }
 
-    #pageTitle {
+    .reader-pages {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+      width: 100%;
+    }
+
+    .reader-pane {
+      min-width: 0;
+    }
+
+    .reader-page-title {
       font-family: var(--font-serif);
       font-size: 1rem;
       font-weight: normal;
@@ -147,6 +185,15 @@
       color: var(--text-dark);
       border-bottom: 1px solid var(--border);
       padding-bottom: 10px;
+    }
+
+    .reader-pane + .reader-pane {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+
+    .reader-pane[hidden] {
+      display: none;
     }
 
     .panel-section {
@@ -179,13 +226,13 @@
       border-top: 1px solid var(--border);
       padding-top: 12px;
     }
-    #readBtn {
+    .read-page-btn {
       width: 100%;
       justify-content: center;
       padding: 8px;
       font-size: 0.875rem;
     }
-    #audioStatus {
+    .audio-status {
       display: block;
       font-size: 0.72rem;
       color: var(--text-light);
@@ -230,18 +277,21 @@
     #layout.hidden, header.hidden { display: none; }
 
     /* ---- RESPONSIVE: Mobile ---- */
-    @media (max-width: 860px) {
+    @media (max-width: 920px) {
       #layout {
         flex-direction: column;
+        align-items: center;
         margin: 12px auto 36px;
         padding: 0 12px;
       }
       #stageWrap {
         width: 100%;
+        max-width: 100%;
       }
       #sidePanel {
         flex: none;
         width: 100%;
+        max-width: 100%;
       }
       #magTitle { max-width: 160px; }
       .reader-header {
@@ -281,7 +331,7 @@
 
     <!-- Left: Back + title -->
     <div class="bar-seg">
-      <a href="index.html" class="btn" aria-label="Back to archive">Main Screen</a>
+      <a href="index.html" class="btn" aria-label="Back to archive">Home</a>
       <div class="divider"></div>
       <span id="magTitle">Loading…</span>
     </div>
@@ -349,26 +399,47 @@
   <!-- Side panel: TTS + page text -->
   <aside id="sidePanel" aria-label="Page content and controls">
 
-    <!-- Page title -->
-    <div id="pageTitle">Page 1</div>
+    <div class="reader-pages">
+      <section class="reader-pane" id="primaryReader" aria-label="Current page reader">
+        <!-- Page title -->
+        <div class="reader-page-title" id="pageTitle">Page 1</div>
 
-    <!-- Page body text -->
-    <div class="panel-section">
-      <h3>Page Text</h3>
-      <div class="panel-text" id="pageText" aria-live="polite"></div>
-    </div>
+        <!-- Page body text -->
+        <div class="panel-section">
+          <h3>Page Text</h3>
+          <div class="panel-text" id="pageText" aria-live="polite"></div>
+        </div>
 
-    <!-- Captions / alt text -->
-    <div class="panel-section">
-      <h3>Captions</h3>
-      <div class="panel-text" id="captionText" aria-live="polite"></div>
+        <!-- Captions / alt text -->
+        <div class="panel-section">
+          <h3>Captions</h3>
+          <div class="panel-text" id="captionText" aria-live="polite"></div>
+        </div>
+
+        <button class="btn read-page-btn" id="readBtn" aria-label="Read this page aloud">Read this page</button>
+        <small class="audio-status" id="audioStatus" aria-live="polite"></small>
+      </section>
+
+      <section class="reader-pane" id="secondaryReader" aria-label="Facing page reader" hidden>
+        <div class="reader-page-title" id="secondaryPageTitle">Page 2</div>
+
+        <div class="panel-section">
+          <h3>Page Text</h3>
+          <div class="panel-text" id="secondaryPageText" aria-live="polite"></div>
+        </div>
+
+        <div class="panel-section">
+          <h3>Captions</h3>
+          <div class="panel-text" id="secondaryCaptionText" aria-live="polite"></div>
+        </div>
+
+        <button class="btn read-page-btn" id="secondaryReadBtn" aria-label="Read facing page aloud">Read this page</button>
+        <small class="audio-status" id="secondaryAudioStatus" aria-live="polite"></small>
+      </section>
     </div>
 
     <!-- Text-to-speech controls -->
     <div class="tts-section">
-      <button class="btn" id="readBtn" aria-label="Read this page aloud">Read this page</button>
-      <small id="audioStatus" aria-live="polite"></small>
-
       <div class="speed-row" role="group" aria-label="Speech speed">
         <span>Speed:</span>
         <button class="btn btn-icon" id="speedDown" aria-label="Decrease speed">−</button>
@@ -428,12 +499,18 @@
   const fallbackPdfBtn= document.getElementById('fallbackPdfBtn');
   const readBtn       = document.getElementById('readBtn');
   const audioStatus   = document.getElementById('audioStatus');
+  const secondaryReader = document.getElementById('secondaryReader');
+  const secondaryReadBtn = document.getElementById('secondaryReadBtn');
+  const secondaryAudioStatus = document.getElementById('secondaryAudioStatus');
   const speedLabel    = document.getElementById('speedLabel');
   const speedDownBtn  = document.getElementById('speedDown');
   const speedUpBtn    = document.getElementById('speedUp');
   const pageTitleEl   = document.getElementById('pageTitle');
   const pageTextEl    = document.getElementById('pageText');
   const captionTextEl = document.getElementById('captionText');
+  const secondaryPageTitleEl = document.getElementById('secondaryPageTitle');
+  const secondaryPageTextEl = document.getElementById('secondaryPageText');
+  const secondaryCaptionTextEl = document.getElementById('secondaryCaptionText');
   const stageWrap     = document.getElementById('stageWrap');
   const stageEl       = document.getElementById('stage');
   const bookEl        = document.getElementById('book');
@@ -450,12 +527,24 @@
   let pageImages      = [];     // Array of image URLs
   let currentPageIdx  = 0;      // 0-based current page index
   let zoomFactor      = 1.0;
+  let basePageWidthCSS = 450;
+  let basePageHeightCSS= 600;
   let pageWidthCSS    = 450;
   let pageHeightCSS   = 600;
   let isSpeaking      = false;
   let speechRate      = 1.0;
   let currentUtterance= null;
-  const MAX_WIDTH     = 900;    // Maximum single-page width in CSS pixels
+  let activeReadBtn   = null;
+  let activeAudioStatus = null;
+  const DESKTOP_PAGE_WIDTH = 680; // Base readable width before default display scaling.
+  const MOBILE_BREAKPOINT  = 920;
+  const DESKTOP_DISPLAY_SCALE = 0.75;
+  const MOBILE_DISPLAY_SCALE = 1;
+  const MOBILE_PAGE_WIDTH = 260;
+  const MOBILE_SIDE_GUTTER = 28;
+  const STAGE_PADDING      = 24;
+  let readerMode           = null;
+  let lastViewportWidth    = window.innerWidth;
 
   // ----------------------------------------------------------------
   // UTILITY: Show a full-page error (magazine not found, etc.)
@@ -492,49 +581,204 @@
     });
   }
 
+  function waitForViewportSettle() {
+    return new Promise(resolve => {
+      requestAnimationFrame(() => requestAnimationFrame(resolve));
+    });
+  }
+
+  function getReaderMode() {
+    return window.innerWidth <= MOBILE_BREAKPOINT ? 'single' : 'spread';
+  }
+
+  function getVisiblePages() {
+    return getReaderMode() === 'single' ? 1 : 2;
+  }
+
+  function getDisplayScale() {
+    return getReaderMode() === 'single' ? MOBILE_DISPLAY_SCALE : DESKTOP_DISPLAY_SCALE;
+  }
+
   // ----------------------------------------------------------------
   // COMPUTE stage dimensions from first loaded image
   // ----------------------------------------------------------------
   function computeSizes(img) {
-    const wrapWidth = Math.min(stageWrap.clientWidth - 24, MAX_WIDTH);
-    pageWidthCSS    = Math.floor(wrapWidth / 2);
-    const ratio     = img.naturalHeight / img.naturalWidth;
-    pageHeightCSS   = Math.floor(pageWidthCSS * ratio);
+    readerMode = getReaderMode();
+    const visiblePages   = getVisiblePages();
+    const viewportGutter = readerMode === 'single' ? MOBILE_SIDE_GUTTER : 24;
+    const availableWidth = Math.max(280, window.innerWidth - viewportGutter - STAGE_PADDING);
+    const ratio          = img.naturalHeight / img.naturalWidth;
 
-    stageEl.style.width  = (pageWidthCSS * 2) + 'px';
-    stageEl.style.height = pageHeightCSS + 'px';
+    if (readerMode === 'single') {
+      basePageWidthCSS = Math.min(img.naturalWidth, availableWidth, MOBILE_PAGE_WIDTH);
+    } else {
+      // Keep the default 100% spread inside the viewport. Larger zoom levels scroll.
+      const maxBaseWidthForViewport = Math.floor(availableWidth / (visiblePages * DESKTOP_DISPLAY_SCALE));
+      const desiredBaseWidth = Math.max(Math.floor(availableWidth / 2), DESKTOP_PAGE_WIDTH);
+      basePageWidthCSS = Math.min(img.naturalWidth, desiredBaseWidth, maxBaseWidthForViewport);
+    }
+    basePageHeightCSS = Math.floor(basePageWidthCSS * ratio);
+
+    applyZoom();
   }
 
   // ----------------------------------------------------------------
-  // ZOOM: Apply zoom to the stage via CSS transform
+  // ZOOM: Resize the actual flipbook dimensions so cursor tracking stays accurate.
   // ----------------------------------------------------------------
   function applyZoom() {
-    // Scale from top-center so zoom expands outward symmetrically
-    stageEl.style.transformOrigin = 'top center';
-    stageEl.style.transform       = `scale(${zoomFactor})`;
+    const visiblePages = getVisiblePages();
+    const displayScale = getDisplayScale();
 
-    // Expand the wrapper to match the scaled height so nothing gets clipped
-    stageWrap.style.height   = (pageHeightCSS * zoomFactor + 24) + 'px';
-    stageWrap.style.overflow = zoomFactor > 1 ? 'auto' : 'hidden';
+    pageWidthCSS  = Math.floor(basePageWidthCSS * displayScale * zoomFactor);
+    pageHeightCSS = Math.floor(basePageHeightCSS * displayScale * zoomFactor);
+
+    const bookWidth = pageWidthCSS * visiblePages;
+
+    stageEl.style.transform = '';
+    stageEl.style.width     = bookWidth + 'px';
+    stageEl.style.height    = pageHeightCSS + 'px';
+    bookEl.style.width      = bookWidth + 'px';
+    bookEl.style.height     = pageHeightCSS + 'px';
+    bookEl.style.minWidth   = bookWidth + 'px';
+    bookEl.style.minHeight  = pageHeightCSS + 'px';
+    stageWrap.style.width   = (bookWidth + STAGE_PADDING) + 'px';
+    stageWrap.style.height  = (pageHeightCSS + STAGE_PADDING) + 'px';
+    stageWrap.style.overflow = readerMode === 'single' || zoomFactor > 1 ? 'auto' : 'hidden';
 
     zoomLabelEl.textContent = Math.round(zoomFactor * 100) + '%';
   }
 
+  function syncBookSize() {
+    if (!book) return;
+
+    const visiblePages = getVisiblePages();
+    const bookWidth = pageWidthCSS * visiblePages;
+    const settings = book.getSettings();
+    settings.width = pageWidthCSS;
+    settings.height = pageHeightCSS;
+    settings.size = readerMode === 'single' ? 'stretch' : 'fixed';
+    settings.minWidth = pageWidthCSS;
+    settings.maxWidth = pageWidthCSS;
+    settings.minHeight = pageHeightCSS;
+    settings.maxHeight = pageHeightCSS;
+
+    const canvas = bookEl.querySelector('canvas');
+    if (canvas) {
+      canvas.style.width = bookWidth + 'px';
+      canvas.style.height = pageHeightCSS + 'px';
+      canvas.width = bookWidth;
+      canvas.height = pageHeightCSS;
+    }
+
+    if (book.getUI && book.getUI().update) {
+      book.getUI().update();
+    } else {
+      book.update();
+    }
+  }
+
   function fitToScreen() {
-    zoomFactor = 1.0;
+    resizeFlipbook(1.0);
+  }
+
+  function bindBookEvents() {
+    book.on('flip', e => {
+      const idx = e.data;
+      pageInput.value = String(idx + 1);
+      updateSidePanel(idx);
+    });
+  }
+
+  function createBook(PageFlipCtor, images, pageIndex = 0) {
     applyZoom();
+    bookEl.innerHTML = '';
+
+    const isSinglePage = readerMode === 'single';
+    book = new PageFlipCtor(bookEl, {
+      width:             pageWidthCSS,
+      height:            pageHeightCSS,
+      size:              isSinglePage ? 'stretch' : 'fixed',
+      minWidth:          pageWidthCSS,
+      maxWidth:          pageWidthCSS,
+      minHeight:         pageHeightCSS,
+      maxHeight:         pageHeightCSS,
+      autoSize:          false,
+      showCover:         true,
+      usePortrait:       true,
+      mobileScrollSupport: false,
+      maxShadowOpacity:  0.15,
+      flippingTime:      550
+    });
+
+    book.loadFromImages(images);
+    bindBookEvents();
+
+    if (pageIndex > 0) {
+      book.turnToPage(pageIndex);
+    }
+  }
+
+  function resizeFlipbook(nextZoomFactor) {
+    const currentPage = book ? book.getCurrentPageIndex() : currentPageIdx;
+    zoomFactor = nextZoomFactor;
+    applyZoom();
+    syncBookSize();
+    pageInput.value = String(currentPage + 1);
+    updateSidePanel(currentPage);
   }
 
   // ----------------------------------------------------------------
   // PAGE TEXT: Update the side panel when page changes
   // ----------------------------------------------------------------
+  function getFacingPageIndex(pageIndex) {
+    if (readerMode !== 'spread') return null;
+    if (pageIndex <= 0) return null;
+
+    const facingIndex = pageIndex + 1;
+    if (facingIndex >= pageImages.length) return null;
+
+    return facingIndex;
+  }
+
+  function setReaderContent(elements, pageIndex) {
+    const data = pageData[pageIndex] || {};
+
+    elements.title.textContent = data.title || `Page ${pageIndex + 1}`;
+    elements.text.textContent = data.text || '';
+    elements.captions.textContent = data.captions || '';
+    elements.readBtn.textContent = 'Read this page';
+    elements.readBtn.setAttribute('aria-label', `Read page ${pageIndex + 1} aloud`);
+    elements.readBtn.dataset.pageIndex = String(pageIndex);
+    elements.status.textContent = '';
+  }
+
   function updateSidePanel(pageIndex) {
     currentPageIdx = pageIndex;
-    const data     = pageData[pageIndex] || {};
+    sidePanel.dataset.readerMode = readerMode;
 
-    pageTitleEl.textContent  = data.title    || `Page ${pageIndex + 1}`;
-    pageTextEl.textContent   = data.text     || '';
-    captionTextEl.textContent= data.captions || '';
+    setReaderContent({
+      title: pageTitleEl,
+      text: pageTextEl,
+      captions: captionTextEl,
+      readBtn,
+      status: audioStatus
+    }, pageIndex);
+
+    const facingPageIndex = getFacingPageIndex(pageIndex);
+    if (facingPageIndex === null) {
+      secondaryReader.hidden = true;
+      secondaryReadBtn.dataset.pageIndex = '';
+      secondaryAudioStatus.textContent = '';
+    } else {
+      secondaryReader.hidden = false;
+      setReaderContent({
+        title: secondaryPageTitleEl,
+        text: secondaryPageTextEl,
+        captions: secondaryCaptionTextEl,
+        readBtn: secondaryReadBtn,
+        status: secondaryAudioStatus
+      }, facingPageIndex);
+    }
 
     // Stop TTS if page changes while reading
     if (isSpeaking) stopReading();
@@ -545,52 +789,78 @@
   // ----------------------------------------------------------------
   function stopReading() {
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-    isSpeaking        = false;
-    currentUtterance  = null;
-    readBtn.textContent = 'Read this page';
-    readBtn.setAttribute('aria-label', 'Read this page aloud');
-    audioStatus.textContent = '';
+    isSpeaking = false;
+    currentUtterance = null;
+    if (activeReadBtn) {
+      const pageIndex = parseInt(activeReadBtn.dataset.pageIndex, 10);
+      activeReadBtn.textContent = 'Read this page';
+      if (!Number.isNaN(pageIndex)) {
+        activeReadBtn.setAttribute('aria-label', `Read page ${pageIndex + 1} aloud`);
+      }
+    }
+    if (activeAudioStatus) activeAudioStatus.textContent = '';
+    activeReadBtn = null;
+    activeAudioStatus = null;
   }
 
-  function startReading() {
+  function startReading(pageIndex, controls) {
     if (!('speechSynthesis' in window)) {
-      audioStatus.textContent = 'Text-to-speech not supported in this browser.';
+      controls.status.textContent = 'Text-to-speech not supported in this browser.';
       return;
     }
 
-    const data = pageData[currentPageIdx] || {};
+    const data = pageData[pageIndex] || {};
     const text = [data.title, data.text, data.captions].filter(Boolean).join('. ');
 
     if (!text.trim()) {
-      audioStatus.textContent = 'No text available for this page.';
+      controls.status.textContent = 'No text available for this page.';
       return;
     }
 
     window.speechSynthesis.cancel();
 
     const utter = new SpeechSynthesisUtterance(text);
-    utter.rate  = speechRate;
+    utter.rate = speechRate;
     currentUtterance = utter;
-    isSpeaking  = true;
+    isSpeaking = true;
+    activeReadBtn = controls.button;
+    activeAudioStatus = controls.status;
 
-    readBtn.textContent = '⏹ Stop reading';
-    readBtn.setAttribute('aria-label', 'Stop reading');
-    audioStatus.textContent = 'Reading…';
+    controls.button.textContent = 'Stop reading';
+    controls.button.setAttribute('aria-label', `Stop reading page ${pageIndex + 1}`);
+    audioStatus.textContent = '';
+    secondaryAudioStatus.textContent = '';
+    controls.status.textContent = 'Reading...';
 
     utter.onend = () => {
       isSpeaking = false;
       currentUtterance = null;
-      readBtn.textContent = 'Read this page';
-      readBtn.setAttribute('aria-label', 'Read this page aloud');
-      audioStatus.textContent = 'Finished.';
-      setTimeout(() => { audioStatus.textContent = ''; }, 2000);
+      controls.button.textContent = 'Read this page';
+      controls.button.setAttribute('aria-label', `Read page ${pageIndex + 1} aloud`);
+      controls.status.textContent = 'Finished.';
+      activeReadBtn = null;
+      activeAudioStatus = null;
+      setTimeout(() => { controls.status.textContent = ''; }, 2000);
     };
     utter.onerror = () => {
       stopReading();
-      audioStatus.textContent = 'Error during speech.';
+      controls.status.textContent = 'Error during speech.';
     };
 
     window.speechSynthesis.speak(utter);
+  }
+
+  function handleReadClick(button, status) {
+    const pageIndex = parseInt(button.dataset.pageIndex, 10);
+    if (Number.isNaN(pageIndex)) return;
+
+    if (isSpeaking) {
+      const clickedActiveReader = activeReadBtn === button;
+      stopReading();
+      if (clickedActiveReader) return;
+    }
+
+    startReading(pageIndex, { button, status });
   }
 
   // ----------------------------------------------------------------
@@ -614,32 +884,18 @@
       return;
     }
 
+    await waitForViewportSettle();
+
     computeSizes(img0);
     statusMsg.textContent = '';
 
-    // Create StPageFlip instance
-    book = new PageFlipCtor(bookEl, {
-      width:             pageWidthCSS,
-      height:            pageHeightCSS,
-      size:              'stretch',
-      showCover:         true,
-      usePortrait:       true,
-      maxShadowOpacity:  0.15,
-      flippingTime:      550
-    });
+    window.activePageFlipCtor = PageFlipCtor;
+    createBook(PageFlipCtor, images, 0);
 
-    book.loadFromImages(images);
     totalPagesEl.textContent = images.length;
     pageInput.value          = '1';
     pageInput.max            = String(images.length);
     updateSidePanel(0);
-
-    // ---- Book events ----
-    book.on('flip', e => {
-      const idx = e.data;
-      pageInput.value = String(idx + 1);
-      updateSidePanel(idx);
-    });
 
     // ---- Navigation ----
     prevBtn.onclick = () => book.flipPrev();
@@ -653,17 +909,16 @@
 
     // ---- Zoom ----
     zoomInBtn.onclick  = () => {
-      zoomFactor = Math.min(3.0, +(zoomFactor + 0.15).toFixed(2));
-      applyZoom();
+      resizeFlipbook(Math.min(3.0, +(zoomFactor + 0.15).toFixed(2)));
     };
     zoomOutBtn.onclick = () => {
-      zoomFactor = Math.max(0.4, +(zoomFactor - 0.15).toFixed(2));
-      applyZoom();
+      resizeFlipbook(Math.max(0.4, +(zoomFactor - 0.15).toFixed(2)));
     };
     fitBtn.onclick = fitToScreen;
 
     // ---- TTS ----
-    readBtn.onclick = () => isSpeaking ? stopReading() : startReading();
+    readBtn.onclick = () => handleReadClick(readBtn, audioStatus);
+    secondaryReadBtn.onclick = () => handleReadClick(secondaryReadBtn, secondaryAudioStatus);
 
     speedDownBtn.onclick = () => {
       speechRate = Math.max(0.5, +(speechRate - 0.25).toFixed(2));
@@ -676,36 +931,41 @@
       if (currentUtterance) currentUtterance.rate = speechRate;
     };
 
-    // ---- Initial zoom: 100% ----
+    // ---- Initial zoom: visually 75%, labeled as 100% ----
     zoomFactor = 1.0;
     applyZoom();
+    lastViewportWidth = window.innerWidth;
+
+    setTimeout(() => {
+      if (!book) return;
+      const widthDelta = Math.abs(window.innerWidth - lastViewportWidth);
+      const nextMode = getReaderMode();
+      if (nextMode === readerMode && widthDelta < 40) return;
+
+      const currentPage = book.getCurrentPageIndex();
+      lastViewportWidth = window.innerWidth;
+      computeSizes(img0);
+      resizeFlipbook(1.0);
+      book.turnToPage(currentPage);
+    }, 250);
 
     // ---- Handle window resize ----
-    let resizeTimer;
+    let resizeFrame = null;
     window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
+      if (resizeFrame) cancelAnimationFrame(resizeFrame);
+      resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = null;
         if (!book) return;
+        const widthDelta = Math.abs(window.innerWidth - lastViewportWidth);
+        const nextMode = getReaderMode();
+        if (nextMode === readerMode && widthDelta < 8) return;
+
         const currentPage = book.getCurrentPageIndex();
+        lastViewportWidth = window.innerWidth;
         computeSizes(img0);
-
-        const oldBook = book;
-        book = new PageFlipCtor(bookEl, {
-          width: pageWidthCSS, height: pageHeightCSS,
-          size: 'stretch', showCover: true, usePortrait: true,
-          maxShadowOpacity: 0.15, flippingTime: 550
-        });
-        oldBook.destroy();
-        book.loadFromImages(images);
-
-        book.on('flip', e => {
-          pageInput.value = String(e.data + 1);
-          updateSidePanel(e.data);
-        });
-
+        resizeFlipbook(zoomFactor);
         book.turnToPage(currentPage);
-        fitToScreen();
-      }, 200);
+      });
     });
   }
 
@@ -778,7 +1038,7 @@
     }
     pageImages = Array.from(
       { length: count },
-      (_, i) => `pages/${magazine.id}/page-${i + 1}.jpg`
+      (_, i) => `pages/${magazine.id}/page-${i + 1}.webp`
     );
 
     // 7. Wait for StPageFlip, then initialize flipbook
