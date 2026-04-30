@@ -48,5 +48,15 @@
     "pdf":         "magazines/mentor-magic-spring-2025.pdf",
     "cover":       "covers/mentor-magic-spring-2025.webp",
     "description": "so much mentor magic"
-  }
+  },
+  {
+  "id": "humanities-fall-2026",
+  "title": "Humanities",
+  "year": "2026",
+  "category": "Fall Issue",
+  "pageCount": 18,
+  "pdf": "magazines/humanities-fall-2026.pdf",
+  "cover": "covers/humanities-fall-2026.webp",
+  "description": "aeoufnoaef."
+}
   ]
